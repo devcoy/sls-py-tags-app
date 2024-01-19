@@ -1,9 +1,9 @@
 version = 0.1
 [default.deploy.parameters]
-stack_name = "sls-python-app-tags"
+stack_name = "sls-py-tags-app"
 resolve_s3 = true
-s3_prefix = "sls-python-app-tags"
+s3_prefix = "sls-py-tags-app"
 region = "us-east-1"
 capabilities = "CAPABILITY_IAM"
-parameter_overrides = "StageName=\"Dev\""
+parameter_overrides = "StageName=\"Dev\" ProjectKey=\"sls-py-tags-app\""
 image_repositories = []
