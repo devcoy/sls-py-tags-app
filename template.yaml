@@ -1,9 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  sls-app-tags
+  sls-py-tags-app
 
-  Sample SAM Template for sls-app-tags using Python
+  Tags Serverless app with Python
 
 # ...................................................................................................
 # ...................................................................................................
@@ -29,6 +29,10 @@ Parameters:
     Type: String
     Default: Dev
     Description: Stage name for the API
+  ProjectKey:
+    Type: String
+    Default: sls-py-tags-app
+    Description: Project key to use as prefix in the resources
 
 # ...................................................................................................
 # ...................................................................................................
@@ -77,9 +81,11 @@ Resources:
   #   1.3.1 Create a Tags Function
   # .................................................................................................
   # .................................................................................................
-  CreateTagsFunction:
+  CreateTagFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub '${ProjectKey}-CreateTagFunction'
+      Description: 'Lambda function to create a Tag'
       CodeUri: src/app/tags/create/
       Handler: app.lambda_handler
       Architectures:
@@ -89,6 +95,15 @@ Resources:
         Variables:
           REGION: !Sub '${AWS::Region}'
           TABLE_NAME: !Ref TagsDynamoDBTable
+          UPDATE_TASK_FUNCTION: 'sls-py-tasks-app-UpdateTaskFunction'
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - lambda:InvokeFunction
+              Resource:
+                - !Sub 'arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:sls-py-tasks-app-UpdateTaskFunction'
       Events:
         CreateTagsApi:
           Type: Api
@@ -104,6 +119,8 @@ Resources:
   GetTagsFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub '${ProjectKey}-GetTagsFunction'
+      Description: 'Lambda function to get Tags (all or by id)'
       CodeUri: src/app/tags/get/
       Handler: app.lambda_handler
       Architectures:
@@ -125,9 +142,11 @@ Resources:
   #   1.3.3 Update a Tags Function
   # .................................................................................................
   # .................................................................................................
-  UpdateTagsFunction:
+  UpdateTagFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub '${ProjectKey}-UpdateTagFunction'
+      Description: 'Lambda function to update a Tag by id'
       CodeUri: src/app/tags/update/
       Handler: app.lambda_handler
       Architectures:
@@ -149,9 +168,11 @@ Resources:
   #   1.3.4 Delete a Tags Function
   # .................................................................................................
   # .................................................................................................
-  DeleteTagsFunction:
+  DeleteTagFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub '${ProjectKey}-DeleteTagFunction'
+      Description: 'Lambda function to delete a Tag by id'
       CodeUri: src/app/tags/delete/
       Handler: app.lambda_handler
       Architectures:
